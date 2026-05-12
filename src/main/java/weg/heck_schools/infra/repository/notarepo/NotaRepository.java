@@ -11,6 +11,7 @@ public interface NotaRepository {
     Nota salvarNota (Nota nota) throws SQLException;
     Optional<Nota> buscarNota (long id) throws SQLException;
     List<Nota> listarNotas () throws SQLException;
+    List<Nota> listarNotasPorIdAluno (long id) throws SQLException;
     void atualizarNota (Nota nota) throws SQLException;
     void deletarNota (long id) throws SQLException;
 }

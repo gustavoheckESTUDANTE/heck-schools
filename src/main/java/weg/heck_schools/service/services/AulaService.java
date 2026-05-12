@@ -12,8 +12,8 @@ import java.util.List;
 
 @Service
 public class AulaService {
-    public AulaRepository aulaRepository;
-    public AulaMapper aulaMapper;
+    public final AulaRepository aulaRepository;
+    public final AulaMapper aulaMapper;
 
     public AulaService(AulaRepository aulaRepository, AulaMapper aulaMapper) {
         this.aulaRepository = aulaRepository;
@@ -22,10 +22,10 @@ public class AulaService {
 
     public AulaResponseDTO cadastrarAula (AulaRequestDTO aulaRequestDTO) throws SQLException {
         Aula aula = aulaMapper.toEntity(aulaRequestDTO);
-        aulaRepository.salvarAula(aula);
         if (aula == null) {
             throw new RuntimeException("Erro ao tentar salvar aula no banco de dados!");
         }
+        aulaRepository.salvarAula(aula);
         return aulaMapper.toResponse(aula);
     }
 

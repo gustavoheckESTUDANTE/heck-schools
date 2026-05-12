@@ -3,9 +3,7 @@ package weg.heck_schools.service.services;
 import org.springframework.stereotype.Service;
 import weg.heck_schools.controller.dto.notadto.NotaRequestDTO;
 import weg.heck_schools.controller.dto.notadto.NotaResponseDTO;
-import weg.heck_schools.controller.dto.turmadto.TurmaResponseDTO;
 import weg.heck_schools.domain.models.Nota;
-import weg.heck_schools.domain.models.Turma;
 import weg.heck_schools.infra.repository.notarepo.NotaRepository;
 import weg.heck_schools.service.mapper.NotaMapper;
 
@@ -15,8 +13,8 @@ import java.util.List;
 
 @Service
 public class NotaService {
-    public NotaRepository notaRepository;
-    public NotaMapper notaMapper;
+    public final NotaRepository notaRepository;
+    public final NotaMapper notaMapper;
 
     public NotaService(NotaRepository notaRepository, NotaMapper notaMapper) {
         this.notaRepository = notaRepository;
@@ -25,10 +23,10 @@ public class NotaService {
 
     public NotaResponseDTO cadastrarNota (NotaRequestDTO notaRequestDTO) throws SQLException {
         Nota nota = notaMapper.toEntity(notaRequestDTO);
-        notaRepository.salvarNota(nota);
         if (nota == null) {
             throw new RuntimeException("Erro ao tentar salvar nota no banco de dados!");
         }
+        notaRepository.salvarNota(nota);
         return notaMapper.toResponse(nota);
     }
 

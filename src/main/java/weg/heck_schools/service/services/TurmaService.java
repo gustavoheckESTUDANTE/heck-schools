@@ -1,17 +1,14 @@
 package weg.heck_schools.service.services;
 
 import org.springframework.stereotype.Service;
-import weg.heck_schools.controller.dto.turmadto.TurmaRequestDTO;
-import weg.heck_schools.controller.dto.turmadto.TurmaResponseDTO;
+import weg.heck_schools.controller.dto.alunodto.AlunoResponseDTO;
 import weg.heck_schools.controller.dto.turmadto.TurmaRequestDTO;
 import weg.heck_schools.controller.dto.turmadto.TurmaResponseDTO;
 import weg.heck_schools.domain.models.Turma;
 import weg.heck_schools.domain.models.Aluno;
-import weg.heck_schools.domain.models.Turma;
 import weg.heck_schools.infra.repository.turmarepo.TurmaRepository;
 import weg.heck_schools.infra.repository.alunorepo.AlunoRepository;
-import weg.heck_schools.infra.repository.turmarepo.TurmaRepository;
-import weg.heck_schools.service.mapper.TurmaMapper;
+import weg.heck_schools.service.mapper.AlunoMapper;
 import weg.heck_schools.service.mapper.TurmaMapper;
 
 import java.sql.SQLException;
@@ -20,22 +17,37 @@ import java.util.List;
 
 @Service
 public class TurmaService {
-    public AlunoRepository alunoRepository;
-    public TurmaRepository turmaRepository;
-    public TurmaMapper turmaMapper;
 
-    public TurmaService(TurmaRepository turmaRepository, TurmaMapper turmaMapper, AlunoRepository alunoRepository) {
+    public final TurmaRepository turmaRepository;
+    public final TurmaMapper turmaMapper;
+    public final AlunoRepository alunoRepository;
+    public final AlunoMapper alunoMapper;
+
+    public TurmaService(TurmaRepository turmaRepository,
+                        TurmaMapper turmaMapper,
+                        AlunoRepository alunoRepository,
+                        AlunoMapper alunoMapper
+    ) {
         this.turmaRepository = turmaRepository;
         this.turmaMapper = turmaMapper;
         this.alunoRepository = alunoRepository;
+        this.alunoMapper = alunoMapper;
     }
 
     public TurmaResponseDTO cadastrarTurma (TurmaRequestDTO turmaRequestDTO) throws SQLException {
         Turma turma = turmaMapper.toEntity(turmaRequestDTO);
-        turmaRepository.salvarTurma(turma);
         if (turma == null) {
             throw new RuntimeException("Erro ao tentar salvar turma no banco de dados!");
+        } else if (turmaRequestDTO.listaAlunosIds().isEmpty()) {
+            throw new RuntimeException("A lista de alunos esta vazia");
         }
+
+        turmaRepository.salvarTurma(turma);
+
+        for (Long alunoId : turmaRequestDTO.listaAlunosIds()) {
+            turmaRepository.associarAlunoATurma(turma.getId(), alunoId);
+        }
+
         return turmaMapper.toResponse(turma, toNameList(turmaRequestDTO.listaAlunosIds()));
     }
 
@@ -86,6 +98,18 @@ public class TurmaService {
             throw new RuntimeException("Não existe nenhum turma com esse id para deletar!");
         }
         turmaRepository.deletarTurma(id);
+    }
+
+    public List<AlunoResponseDTO> alunosDaTurma (long id) throws SQLException {
+        if (turmaRepository.buscarTurma(id).isEmpty()) {
+            throw new RuntimeException("Não existe nenhuma turma com esse id para listar seus alunos!");
+        }
+        List<AlunoResponseDTO> listaAlunosDTO = new ArrayList<>();
+        List<Aluno> listaAlunos = alunoRepository.listarAlunosDaTurma(id);
+        for (Aluno aluno : listaAlunos) {
+            listaAlunosDTO.add(alunoMapper.toResponse(aluno));
+        }
+        return listaAlunosDTO;
     }
 
     public List<String> toNameList (List<Long> idsList) throws SQLException {

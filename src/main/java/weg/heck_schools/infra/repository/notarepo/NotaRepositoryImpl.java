@@ -104,6 +104,37 @@ public class NotaRepositoryImpl implements NotaRepository {
     }
 
     @Override
+    public List<Nota> listarNotasPorIdAluno(long id) throws SQLException {
+        String sql = """
+                SELECT FROM nota
+                    id,
+                    aluno_id,
+                    aula_id,
+                    valor
+                WHERE
+                    aluno_id = ?
+                """;
+        List<Nota> notasList = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                long idBuscado = rs.getLong("id");
+                long alunoId = rs.getLong("aluno_id");
+                long aulaId = rs.getLong("aula_id");
+                double valor = rs.getDouble("valor");
+
+                notasList.add(new Nota(idBuscado, alunoId, aulaId, valor));
+            }
+            return notasList;
+        }
+    }
+
+    @Override
     public void atualizarNota(Nota nota) throws SQLException {
         String sql = """
                 UPDATE

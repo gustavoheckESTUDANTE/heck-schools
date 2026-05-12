@@ -12,8 +12,8 @@ import java.sql.SQLException;
 @Component
 public class NotaMapper {
 
-    public AlunoRepository alunoRepository;
-    public AulaRepository aulaRepository;
+    public final AlunoRepository alunoRepository;
+    public final AulaRepository aulaRepository;
 
     public NotaMapper(AlunoRepository alunoRepository, AulaRepository aulaRepository) {
         this.alunoRepository = alunoRepository;
@@ -29,10 +29,16 @@ public class NotaMapper {
     }
 
     public NotaResponseDTO toResponse (Nota nota) throws SQLException {
+        if (alunoRepository.buscarAluno(nota.getAlunoId()).isEmpty() ||
+                aulaRepository.buscarAula(nota.getAulaId()).isEmpty()) {
+
+            throw new RuntimeException("Não foi encontrado nenhum aluno ou aula com este id");
+        }
+
         return new NotaResponseDTO(
                 nota.getId(),
-                alunoRepository.buscarAluno(nota.getAlunoId()).getNome(),
-                aulaRepository.buscarAula(nota.getAulaId()).getAssunto(),
+                alunoRepository.buscarAluno(nota.getAlunoId()).get().getNome(),
+                aulaRepository.buscarAula(nota.getAulaId()).get().getAssunto(),
                 nota.getValor()
         );
     }

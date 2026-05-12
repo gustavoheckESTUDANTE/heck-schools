@@ -47,6 +47,25 @@ public class TurmaRepositoryImpl implements TurmaRepository {
     }
 
     @Override
+    public void associarAlunoATurma(long turmaId, long alunoId) throws SQLException {
+        String sql = """
+                INSERT INTO turma_aluno
+                    (turma_id,
+                    aluno_id)
+                VALUES
+                    (?, ?)
+                """;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setLong(1, turmaId);
+            stmt.setLong(2, alunoId);
+
+            stmt.executeUpdate();
+        }
+    }
+
+    @Override
     public Optional<Turma> buscarTurma(long id) throws SQLException {
         String sql = """
                 SELECT FROM turma
@@ -88,6 +107,37 @@ public class TurmaRepositoryImpl implements TurmaRepository {
         List<Turma> turmasList = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                long idBuscado = rs.getLong("id");
+                String nome = rs.getString("nome");
+                long cursoId = rs.getLong("curso_id");
+                long professorId = rs.getLong("professor_id");
+
+                turmasList.add(new Turma(idBuscado, nome, cursoId, professorId));
+            }
+            return turmasList;
+        }
+    }
+
+    @Override
+    public List<Turma> listarTurmasPorIdCurso(long id) throws SQLException {
+        String sql = """
+                SELECT FROM turma
+                    id,
+                    nome,
+                    curso_id,
+                    professor_id
+                WHERE
+                    curso_id = ?
+                """;
+        List<Turma> turmasList = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
 
             ResultSet rs = stmt.executeQuery();
 

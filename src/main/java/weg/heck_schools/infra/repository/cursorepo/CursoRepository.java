@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface CursoRepository {
 
     Curso salvarCurso (Curso curso) throws SQLException;
+    void associarProfessorAoCurso (long cursoId, long professorId) throws SQLException;
     Optional<Curso> buscarCurso (long id) throws SQLException;
     List<Curso> listarCursos () throws SQLException;
     void atualizarCurso (Curso curso) throws SQLException;

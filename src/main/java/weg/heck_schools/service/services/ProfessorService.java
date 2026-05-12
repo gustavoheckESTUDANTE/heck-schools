@@ -13,8 +13,8 @@ import java.util.List;
 @Service
 public class ProfessorService {
 
-    public ProfessorRepository professorRepository;
-    public ProfessorMapper professorMapper;
+    public final ProfessorRepository professorRepository;
+    public final ProfessorMapper professorMapper;
 
     public ProfessorService(ProfessorRepository professorRepository, ProfessorMapper professorMapper) {
         this.professorRepository = professorRepository;
@@ -23,10 +23,10 @@ public class ProfessorService {
 
     public ProfessorResponseDTO cadastrarProfessor (ProfessorRequestDTO professorRequestDTO) throws SQLException {
         Professor professor = professorMapper.toEntity(professorRequestDTO);
-        professorRepository.salvarProfessor(professor);
         if (professor == null) {
             throw new RuntimeException("Erro ao tentar salvar professor no banco de dados!");
         }
+        professorRepository.salvarProfessor(professor);
         return professorMapper.toResponse(professor);
     }
 

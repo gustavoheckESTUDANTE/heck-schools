@@ -45,6 +45,25 @@ public class CursoRepositoryImpl implements CursoRepository {
     }
 
     @Override
+    public void associarProfessorAoCurso(long cursoId, long professorId) throws SQLException {
+        String sql = """
+                INSERT INTO curso_professor
+                    (curso_id,
+                    professor_id)
+                VALUES
+                    (?, ?)
+                """;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setLong(1, cursoId);
+            stmt.setLong(2, professorId);
+
+            stmt.executeUpdate();
+        }
+    }
+
+    @Override
     public Optional<Curso> buscarCurso(long id) throws SQLException {
         String sql = """
                 SELECT FROM curso
