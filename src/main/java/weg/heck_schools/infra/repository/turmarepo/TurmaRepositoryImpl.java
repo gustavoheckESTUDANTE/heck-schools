@@ -68,11 +68,13 @@ public class TurmaRepositoryImpl implements TurmaRepository {
     @Override
     public Optional<Turma> buscarTurma(long id) throws SQLException {
         String sql = """
-                SELECT FROM turma
+                SELECT
                     id,
                     nome,
                     curso_id,
                     professor_id
+                FROM
+                    turma
                 WHERE
                     id = ?
                 """;
@@ -98,11 +100,13 @@ public class TurmaRepositoryImpl implements TurmaRepository {
     @Override
     public List<Turma> listarTurmas() throws SQLException {
         String sql = """
-                SELECT FROM turma
+                SELECT
                     id,
                     nome,
                     curso_id,
                     professor_id
+                FROM
+                    turma
                 """;
         List<Turma> turmasList = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
@@ -125,11 +129,13 @@ public class TurmaRepositoryImpl implements TurmaRepository {
     @Override
     public List<Turma> listarTurmasPorIdCurso(long id) throws SQLException {
         String sql = """
-                SELECT FROM turma
+                SELECT
                     id,
                     nome,
                     curso_id,
                     professor_id
+                FROM
+                    turma
                 WHERE
                     curso_id = ?
                 """;

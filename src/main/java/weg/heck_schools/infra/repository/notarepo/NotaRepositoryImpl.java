@@ -49,11 +49,13 @@ public class NotaRepositoryImpl implements NotaRepository {
     @Override
     public Optional<Nota> buscarNota(long id) throws SQLException {
         String sql = """
-                SELECT FROM nota
+                SELECT
                     id,
                     aluno_id,
                     aula_id,
                     valor
+                FROM
+                    nota
                 WHERE
                     id = ?
                 """;
@@ -79,11 +81,13 @@ public class NotaRepositoryImpl implements NotaRepository {
     @Override
     public List<Nota> listarNotas() throws SQLException {
         String sql = """
-                SELECT FROM nota
+                SELECT
                     id,
                     aluno_id,
                     aula_id,
                     valor
+                FROM
+                    nota
                 """;
         List<Nota> notasList = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
@@ -106,11 +110,13 @@ public class NotaRepositoryImpl implements NotaRepository {
     @Override
     public List<Nota> listarNotasPorIdAluno(long id) throws SQLException {
         String sql = """
-                SELECT FROM nota
+                SELECT
                     id,
                     aluno_id,
                     aula_id,
                     valor
+                FROM
+                    nota
                 WHERE
                     aluno_id = ?
                 """;

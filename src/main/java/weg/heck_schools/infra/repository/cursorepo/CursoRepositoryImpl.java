@@ -66,10 +66,12 @@ public class CursoRepositoryImpl implements CursoRepository {
     @Override
     public Optional<Curso> buscarCurso(long id) throws SQLException {
         String sql = """
-                SELECT FROM curso
+                SELECT
                     id,
                     nome,
                     codigo
+                FROM
+                    curso
                 WHERE
                     id = ?
                 """;

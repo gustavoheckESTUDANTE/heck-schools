@@ -28,7 +28,7 @@ public class AlunoRepositoryImpl implements AlunoRepository {
                     matricula,
                     data_nascimento)
                 VALUES
-                    (?, ?, ?, ?, ?)
+                    (?, ?, ?, ?)
                 """;
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -53,12 +53,14 @@ public class AlunoRepositoryImpl implements AlunoRepository {
     @Override
     public Optional<Aluno> buscarAluno(long id) throws SQLException {
         String sql = """
-                SELECT FROM aluno
+                SELECT
                     id,
                     nome,
                     email,
                     matricula,
                     data_nascimento
+                FROM
+                    aluno
                 WHERE
                     id = ?
                 """;
@@ -86,12 +88,14 @@ public class AlunoRepositoryImpl implements AlunoRepository {
     @Override
     public List<Aluno> listarAlunos() throws SQLException {
         String sql = """
-                SELECT FROM aluno
+                SELECT
                     id,
                     nome,
                     email,
                     matricula,
                     data_nascimento
+                FROM
+                    aluno
                 """;
         List<Aluno> alunosList = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
@@ -115,12 +119,14 @@ public class AlunoRepositoryImpl implements AlunoRepository {
 
     public List<Aluno> listarAlunosPorVariosIds(List<Long> listaIds) throws SQLException {
         String sql = """
-                SELECT FROM aluno
+                SELECT
                     id,
                     nome,
                     email,
                     matricula,
                     data_nascimento
+                FROM
+                    aluno
                 WHERE
                     id IN (?""";
         StringBuilder sb = new StringBuilder();

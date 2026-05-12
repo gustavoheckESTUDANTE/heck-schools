@@ -51,11 +51,13 @@ public class AulaRepositoryImpl implements AulaRepository{
     @Override
     public Optional<Aula> buscarAula(long id) throws SQLException {
         String sql = """
-                SELECT FROM aula
+                SELECT
                     id,
                     turma_id,
                     data_hora,
                     assunto
+                FROM
+                    aula
                 WHERE
                     id = ?
                 """;
@@ -82,11 +84,13 @@ public class AulaRepositoryImpl implements AulaRepository{
     @Override
     public List<Aula> listarAulas() throws SQLException {
         String sql = """
-                SELECT FROM aula
+                SELECT
                     id,
                     turma_id,
                     data_hora,
                     assunto
+                FROM
+                    aula
                 """;
         List<Aula> aulasList = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();

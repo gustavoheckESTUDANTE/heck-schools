@@ -52,11 +52,13 @@ public class ProfessorRepositoryImpl implements ProfessorRepository {
     @Override
     public Optional<Professor> buscarProfessor(long id) throws SQLException {
         String sql = """
-                SELECT FROM professor
+                SELECT
                     id,
                     nome,
                     email,
                     disciplina
+                FROM
+                    professor
                 WHERE
                     id = ?
                 """;
@@ -82,11 +84,13 @@ public class ProfessorRepositoryImpl implements ProfessorRepository {
     @Override
     public List<Professor> listarProfessors() throws SQLException {
         String sql = """
-                SELECT FROM professor
+                SELECT
                     id,
                     nome,
                     email,
                     disciplina
+                FROM
+                    professor
                 """;
         List<Professor> professoresList = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
@@ -108,11 +112,13 @@ public class ProfessorRepositoryImpl implements ProfessorRepository {
 
     public List<Professor> listarProfessoresPorVariosIds(List<Long> listaIds) throws SQLException {
         String sql = """
-                SELECT FROM professor
+                SELECT
                     id,
                     nome,
                     email,
                     disciplina
+                FROM
+                    professor
                 WHERE
                     id IN (?""";
         StringBuilder sb = new StringBuilder();
