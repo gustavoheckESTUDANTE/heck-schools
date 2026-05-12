@@ -48,7 +48,7 @@ public class CursoService {
         cursoRepository.salvarCurso(curso);
 
         for (Long professorId : cursoRequestDTO.listaProfessorIds()) {
-            turmaRepository.associarAlunoATurma(curso.getId(), professorId);
+            cursoRepository.associarProfessorAoCurso(curso.getId(), professorId);
         }
 
         return cursoMapper.toResponse(curso, toNameList(cursoRequestDTO.listaProfessorIds()));
