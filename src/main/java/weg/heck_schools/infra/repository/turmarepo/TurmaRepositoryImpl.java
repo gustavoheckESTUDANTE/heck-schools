@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class TurmaRepositoryImpl implements TurmaRepository {
@@ -46,7 +47,7 @@ public class TurmaRepositoryImpl implements TurmaRepository {
     }
 
     @Override
-    public Turma buscarTurma(long id) throws SQLException {
+    public Optional<Turma> buscarTurma(long id) throws SQLException {
         String sql = """
                 SELECT FROM turma
                     id,
@@ -69,9 +70,9 @@ public class TurmaRepositoryImpl implements TurmaRepository {
                 long cursoId = rs.getLong("curso_id");
                 long professorId = rs.getLong("professor_id");
 
-                return new Turma(idBuscado, nome, cursoId, professorId);
+                return Optional.of(new Turma(idBuscado, nome, cursoId, professorId));
             }
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -144,4 +145,6 @@ public class TurmaRepositoryImpl implements TurmaRepository {
 
         }
     }
+
+
 }

@@ -1,12 +1,16 @@
 package weg.heck_schools.infra.repository.professorrepo;
 
 import org.springframework.stereotype.Repository;
+import weg.heck_schools.domain.models.Aluno;
+import weg.heck_schools.domain.models.Curso;
 import weg.heck_schools.domain.models.Professor;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class ProfessorRepositoryImpl implements ProfessorRepository {
@@ -46,7 +50,7 @@ public class ProfessorRepositoryImpl implements ProfessorRepository {
     }
 
     @Override
-    public Professor buscarProfessor(long id) throws SQLException {
+    public Optional<Professor> buscarProfessor(long id) throws SQLException {
         String sql = """
                 SELECT FROM professor
                     id,
@@ -69,9 +73,9 @@ public class ProfessorRepositoryImpl implements ProfessorRepository {
                 String email = rs.getString("email");
                 String disciplina = rs.getString("disciplina");
 
-                return new Professor(idBuscado, nome, email, disciplina);
+                return Optional.of(new Professor(idBuscado, nome, email, disciplina));
             }
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -84,7 +88,7 @@ public class ProfessorRepositoryImpl implements ProfessorRepository {
                     email,
                     disciplina
                 """;
-        List<Professor> professorsList = new ArrayList<>();
+        List<Professor> professoresList = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -96,9 +100,49 @@ public class ProfessorRepositoryImpl implements ProfessorRepository {
                 String email = rs.getString("email");
                 String disciplina = rs.getString("disciplina");
 
-                professorsList.add(new Professor(idBuscado, nome, email, disciplina));
+                professoresList.add(new Professor(idBuscado, nome, email, disciplina));
             }
-            return professorsList;
+            return professoresList;
+        }
+    }
+
+    public List<Professor> listarProfessoresPorVariosIds(List<Long> listaIds) throws SQLException {
+        String sql = """
+                SELECT FROM professor
+                    id,
+                    nome,
+                    email,
+                    disciplina
+                WHERE
+                    id IN (?""";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < listaIds.size(); i++) {
+            if (i != listaIds.size() - 1) {
+                sb.append(", ?");
+            } else {
+                sb.append("?)");
+            }
+        }
+        sql += sb.toString();
+        List<Professor> professoresList = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < listaIds.size(); i++) {
+                stmt.setLong(i + 1, listaIds.get(i));
+            }
+
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                long idBuscado = rs.getLong("id");
+                String nome = rs.getString("nome");
+                String email = rs.getString("email");
+                String disciplina = rs.getString("disciplina");
+
+                professoresList.add(new Professor(idBuscado, nome, email, disciplina));
+            }
+            return professoresList;
         }
     }
 
@@ -144,4 +188,43 @@ public class ProfessorRepositoryImpl implements ProfessorRepository {
 
         }
     }
+    @Override
+    public List<Professor> listarProfessoresDoCurso(long id) throws SQLException {
+        String sql = """
+                SELECT
+                	p.id,
+                    p.nome,
+                    p.email,
+                    p.disciplina
+                FROM
+                    curso AS c
+                WHERE
+                    c.id = ?
+                JOIN
+                    curso_professor AS cp
+                	    ON c.id = cp.curso_id
+                JOIN
+                    professor AS p
+                	    ON cp.professor_id = p.id
+                """;
+        List<Professor> professoresDoCurso = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                long idBuscado = rs.getLong("id");
+                String nome = rs.getString("nome");
+                String email = rs.getString("email");
+                String disciplina = rs.getString("disciplina");
+
+                professoresDoCurso.add(new Professor(idBuscado, nome, email, disciplina));
+            }
+            return professoresDoCurso;
+        }
+    }
+
 }

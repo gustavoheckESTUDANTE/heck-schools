@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class NotaRepositoryImpl implements NotaRepository {
@@ -46,7 +47,7 @@ public class NotaRepositoryImpl implements NotaRepository {
     }
 
     @Override
-    public Nota buscarNota(long id) throws SQLException {
+    public Optional<Nota> buscarNota(long id) throws SQLException {
         String sql = """
                 SELECT FROM nota
                     id,
@@ -69,9 +70,9 @@ public class NotaRepositoryImpl implements NotaRepository {
                 long aulaId = rs.getLong("aula_id");
                 double valor = rs.getDouble("valor");
 
-                return new Nota(idBuscado, alunoId, aulaId, valor);
+                return Optional.of(new Nota(idBuscado, alunoId, aulaId, valor));
             }
-            return null;
+            return Optional.empty();
         }
     }
 

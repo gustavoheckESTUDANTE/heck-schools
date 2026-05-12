@@ -8,6 +8,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class AlunoRepositoryImpl implements AlunoRepository {
@@ -50,7 +51,7 @@ public class AlunoRepositoryImpl implements AlunoRepository {
     }
 
     @Override
-    public Aluno buscarAluno(long id) throws SQLException {
+    public Optional<Aluno> buscarAluno(long id) throws SQLException {
         String sql = """
                 SELECT FROM aluno
                     id,
@@ -76,9 +77,9 @@ public class AlunoRepositoryImpl implements AlunoRepository {
                 LocalDate dataNascimento =
                         (rs.getDate("data_nascimento") != null) ? (rs.getDate("data_nascimento").toLocalDate()) : (null);
 
-                return new Aluno(idBuscado, nome, email, matricula, dataNascimento);
+                return Optional.of(new Aluno(idBuscado, nome, email, matricula, dataNascimento));
             }
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -95,6 +96,49 @@ public class AlunoRepositoryImpl implements AlunoRepository {
         List<Aluno> alunosList = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                long idBuscado = rs.getLong("id");
+                String nome = rs.getString("nome");
+                String email = rs.getString("email");
+                String matricula = rs.getString("matricula");
+                LocalDate dataNascimento =
+                        (rs.getDate("data_nascimento") != null) ? (rs.getDate("data_nascimento").toLocalDate()) : (null);
+
+                alunosList.add(new Aluno(idBuscado, nome, email, matricula, dataNascimento));
+            }
+            return alunosList;
+        }
+    }
+
+    public List<Aluno> listarAlunosPorVariosIds(List<Long> listaIds) throws SQLException {
+        String sql = """
+                SELECT FROM aluno
+                    id,
+                    nome,
+                    email,
+                    matricula,
+                    data_nascimento
+                WHERE
+                    id IN (?""";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < listaIds.size(); i++) {
+            if (i != listaIds.size() - 1) {
+                sb.append(", ?");
+            } else {
+                sb.append("?)");
+            }
+        }
+        sql += sb.toString();
+        List<Aluno> alunosList = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < listaIds.size(); i++) {
+                stmt.setLong(i + 1, listaIds.get(i));
+            }
 
             ResultSet rs = stmt.executeQuery();
 
@@ -154,6 +198,49 @@ public class AlunoRepositoryImpl implements AlunoRepository {
 
             stmt.executeUpdate();
 
+        }
+    }
+
+    @Override
+    public List<Aluno> listarAlunosDaTurma(long id) throws SQLException {
+        String sql = """
+                SELECT
+                	a.id,
+                    a.nome,
+                    a.email,
+                    a.matricula,
+                    a.data_nascimento
+                FROM
+                    turma AS t
+                WHERE
+                    t.id = ?
+                JOIN
+                    turma_aluno AS ta
+                	    ON t.id = ta.turma_id
+                JOIN
+                    aluno AS a
+                	    ON ta.aluno_id = a.id
+                """;
+        List<Aluno> alunosDaTurma = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                long idBuscado = rs.getLong("id");
+                String nome = rs.getString("nome");
+                String email = rs.getString("email");
+                String matricula = rs.getString("matricula");
+                LocalDate dataNascimento = (rs.getDate("data_nascimento") != null) ?
+                        (rs.getDate("data_nascimento").toLocalDate()) :
+                        (null);
+
+                alunosDaTurma.add(new Aluno(idBuscado, nome, email, matricula, dataNascimento));
+            }
+            return alunosDaTurma;
         }
     }
 }

@@ -4,11 +4,12 @@ import weg.heck_schools.domain.models.Aula;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public interface AulaRepository {
 
     Aula salvarAula (Aula aula) throws SQLException;
-    Aula buscarAula (long id) throws SQLException;
+    Optional<Aula> buscarAula (long id) throws SQLException;
     List<Aula> listarAulas () throws SQLException;
     void atualizarAula (Aula aula) throws SQLException;
     void deletarAula (long id) throws SQLException;

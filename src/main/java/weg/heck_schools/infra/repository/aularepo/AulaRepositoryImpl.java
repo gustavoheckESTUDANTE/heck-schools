@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class AulaRepositoryImpl implements AulaRepository{
@@ -48,7 +49,7 @@ public class AulaRepositoryImpl implements AulaRepository{
     }
 
     @Override
-    public Aula buscarAula(long id) throws SQLException {
+    public Optional<Aula> buscarAula(long id) throws SQLException {
         String sql = """
                 SELECT FROM aula
                     id,
@@ -72,9 +73,9 @@ public class AulaRepositoryImpl implements AulaRepository{
                         (rs.getTimestamp("data_nascimento") != null) ? (rs.getTimestamp("data_nascimento").toLocalDateTime()) : (null);
                 String assunto = rs.getString("assunto");
 
-                return new Aula(idBuscado, turmaId, dataHora, assunto);
+                return Optional.of(new Aula(idBuscado, turmaId, dataHora, assunto));
             }
-            return null;
+            return Optional.empty();
         }
     }
 

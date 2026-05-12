@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class CursoRepositoryImpl implements CursoRepository {
@@ -44,7 +45,7 @@ public class CursoRepositoryImpl implements CursoRepository {
     }
 
     @Override
-    public Curso buscarCurso(long id) throws SQLException {
+    public Optional<Curso> buscarCurso(long id) throws SQLException {
         String sql = """
                 SELECT FROM curso
                     id,
@@ -65,9 +66,9 @@ public class CursoRepositoryImpl implements CursoRepository {
                 String nome = rs.getString("nome");
                 String codigo = rs.getString("codigo");
 
-                return new Curso(idBuscado, nome, codigo);
+                return Optional.of(new Curso(idBuscado, nome, codigo));
             }
-            return null;
+            return Optional.empty();
         }
     }
 
